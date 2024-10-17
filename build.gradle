@@ -521,6 +521,12 @@ subprojects {
   }
 
   task generatePackageInfo {
+    inputs.files fileTree('src/main/java/').matching() {
+      include "*/**/*.java"
+      exclude "*/**/package-info.java"
+    }
+    outputs.files inputs.files.files.collect { new File(it.parentFile, 'package-info.java')}.toSet()
+
     doLast {
       def allPathsContainingJavaFiles = [] as Set
 
@@ -561,6 +567,9 @@ subprojects {
     }
   }
   build.dependsOn(generatePackageInfo)
+  licenseMain.mustRunAfter generatePackageInfo
+  licenseFormatMain.mustRunAfter generatePackageInfo
+  compileJava.mustRunAfter generatePackageInfo
   generatePackageInfo.finalizedBy(licenseFormat)
 
   jacocoTestReport {

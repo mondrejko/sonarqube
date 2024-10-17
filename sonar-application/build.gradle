@@ -109,6 +109,8 @@ downloadLicenses {
 }
 
 tasks.register('downloadJres') {
+  inputs.file(layout.projectDirectory.dir('src/main/resources/jres-metadata.json').asFile)
+  outputs.dir(layout.buildDirectory.file('jres'))
   doLast {
     def jresMetadata = new JsonSlurper().parse(file(layout.projectDirectory.dir('src/main/resources/jres-metadata.json').asFile))
     jresMetadata.each { jre ->
