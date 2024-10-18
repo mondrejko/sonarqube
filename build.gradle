@@ -567,9 +567,9 @@ subprojects {
     }
   }
   build.dependsOn(generatePackageInfo)
-  licenseMain.mustRunAfter generatePackageInfo
-  licenseFormatMain.mustRunAfter generatePackageInfo
-  compileJava.mustRunAfter generatePackageInfo
+  tasks.named('licenseMain').configure { it.mustRunAfter(generatePackageInfo) }
+  tasks.named('licenseFormatMain').configure { it.mustRunAfter(generatePackageInfo) }
+  tasks.named('compileJava').configure { it.mustRunAfter(generatePackageInfo) }
   generatePackageInfo.finalizedBy(licenseFormat)
 
   jacocoTestReport {
