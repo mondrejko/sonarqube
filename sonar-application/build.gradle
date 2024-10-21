@@ -367,7 +367,6 @@ task cleanLocalUnzippedDir(dependsOn: zip) {
   def unzippedDir = file("$buildDir/distributions/sonarqube-$version")
   inputs.files(file("$buildDir/distributions/sonar-application-${version}.zip"))
   outputs.upToDateWhen { true }
-  outputs.cacheIf('Caching has not been enabled for the task.') { false }
 
   doLast {
     println("delete directory ${unzippedDir}")
