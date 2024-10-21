@@ -526,6 +526,7 @@ subprojects {
       exclude "*/**/package-info.java"
     }
     outputs.files inputs.files.files.collect { new File(it.parentFile, 'package-info.java')}.toSet()
+    outputs.cacheIf { true }
 
     doLast {
       def allPathsContainingJavaFiles = [] as Set
