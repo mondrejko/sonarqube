@@ -573,17 +573,18 @@ subprojects {
 
     }
   }
-  build.dependsOn(generatePackageInfo)
-  tasks.named('licenseMain').configure { it.mustRunAfter(generatePackageInfo) }
-  tasks.named('licenseFormatMain').configure { it.mustRunAfter(generatePackageInfo) }
-  tasks.named('compileJava').configure { it.mustRunAfter(generatePackageInfo) }
-  generatePackageInfo.finalizedBy(licenseFormat)
 
   task copyPackageInfo(type: Copy) {
     from generatePackageInfo
     into 'src/main/java'
     onlyIf { project.generatePackageInfo.didWork}
   }
+
+  build.dependsOn(generatePackageInfo)
+  tasks.named('licenseMain').configure { it.mustRunAfter(generatePackageInfo, copyPackageInfo) }
+  tasks.named('licenseFormatMain').configure { it.mustRunAfter(generatePackageInfo, copyPackageInfo) }
+  tasks.named('compileJava').configure { it.mustRunAfter(generatePackageInfo, copyPackageInfo) }
+  generatePackageInfo.finalizedBy(licenseFormat)
   generatePackageInfo.finalizedBy(copyPackageInfo)
 
 
