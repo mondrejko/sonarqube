@@ -529,7 +529,6 @@ subprojects {
       exclude "*/**/package-info.java"
     }
     outputs.dir outputDir
-    //outputs.files inputs.files.files.collect { new File(it.parentFile, 'package-info.java')}.toSet()
     outputs.cacheIf { true }
 
     doLast {
@@ -550,7 +549,7 @@ subprojects {
         File packageInfoFile = new File (packageInfoPath)
         if (!packageInfoFile.exists()) {
             logger.info("Creating file: " + packageInfoPath)
-            def packageName = packageInfoFile.getParent().replaceAll("[\\\\ /]", ".").takeAfter("src.main.java.");
+            def packageName = packageInfoFile.getParent().replaceAll("[\\\\ /]", ".").takeAfter("${name}.");
             String packageInfoContent = applyPackageInfoTemplate(packageName)
             packageInfoFile << packageInfoContent
         }
@@ -579,6 +578,14 @@ subprojects {
   tasks.named('licenseFormatMain').configure { it.mustRunAfter(generatePackageInfo) }
   tasks.named('compileJava').configure { it.mustRunAfter(generatePackageInfo) }
   generatePackageInfo.finalizedBy(licenseFormat)
+
+  task copyPackageInfo(type: Copy) {
+    from generatePackageInfo
+    into 'src/main/java'
+    onlyIf { project.generatePackageInfo.didWork}
+  }
+  generatePackageInfo.finalizedBy(copyPackageInfo)
+
 
   jacocoTestReport {
     reports {
