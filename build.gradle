@@ -580,7 +580,6 @@ subprojects {
   task copyPackageInfo(type: Copy) {
     from generatePackageInfo
     into 'src/main/java'
-    onlyIf { project.generatePackageInfo.didWork}
   }
 
   build.dependsOn(generatePackageInfo)
