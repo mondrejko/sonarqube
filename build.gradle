@@ -522,7 +522,6 @@ subprojects {
 
   task generatePackageInfo {
     String srcMainJava = 'src/main/java'
-    String srcMainJavaPath = project.file(srcMainJava).absolutePath
     File outputDir = project.layout.buildDirectory.dir(name).get().asFile
     inputs.files(fileTree(srcMainJava).matching() {
       include "*/**/*.java"
@@ -532,29 +531,25 @@ subprojects {
     outputs.cacheIf { true }
 
     doLast {
-      def allPathsContainingJavaFiles = [] as Set
-
-      fileTree(srcMainJava).matching() {
-        include "*/**/*.java"
-        exclude "*/**/package-info.java"
-      }.forEach {
+      Set<String> allPathsContainingJavaFiles = [] as Set<String>
+      inputs.files.files.forEach {
         allPathsContainingJavaFiles << it.toPath().toFile().parent
       }
 
       allPathsContainingJavaFiles.each {
         String dir = it as String
-        File srcPackageInfoFile = project.file(dir + "/package-info.java")
+        File packageInfoInputFile = project.file("${dir}/package-info.java")
 
         File packageInfoOutputDir = project.file(dir.replace(project.file(srcMainJava).absolutePath, outputDir.absolutePath))
         packageInfoOutputDir.mkdirs()
-        String packageInfoPath = packageInfoOutputDir.absolutePath + "/package-info.java"
-        File packageInfoFile = project.file(packageInfoPath)
+        String packageInfoOutputPath = "${packageInfoOutputDir.absolutePath}/package-info.java"
+        File packageInfoOutputFile = project.file(packageInfoOutputPath)
 
-        if (!srcPackageInfoFile.exists()) {
-            logger.info("Creating file: " + packageInfoPath)
-            def packageName = packageInfoFile.getParent().replaceAll("[\\\\ /]", ".").takeAfter("${name}.");
+        if (!packageInfoInputFile.exists()) {
+            logger.info("Creating file: " + packageInfoOutputPath)
+            def packageName = packageInfoOutputFile.getParent().replaceAll("[\\\\ /]", ".").takeAfter("${name}.");
             String packageInfoContent = applyPackageInfoTemplate(packageName)
-            packageInfoFile << packageInfoContent
+            packageInfoOutputFile << packageInfoContent
         }
       }
 
